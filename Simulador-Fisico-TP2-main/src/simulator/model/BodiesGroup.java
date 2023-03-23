@@ -67,4 +67,8 @@ public class BodiesGroup {
 		this.forcelaws = forcelaws;
 	}
 	
+	public String getForceLawsInfo() {
+		return forcelaws.toString();
+	}
+	
 }
