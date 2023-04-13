@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -38,6 +40,7 @@ public class Main {
 	private final static Double _dtimeDefaultValue = 2500.0;
 	private final static String _forceLawsDefaultValue = "nlug";
 	private final static String _outputDefaultValue = "the standard output";
+	private final static String _modeDefaultValue = "gui";
 
 	// some attributes to stores values corresponding to command-line parameters
 	//
@@ -130,7 +133,11 @@ public class Main {
 		
 		// -s option
 		cmdLineOptions.addOption(Option.builder("s").longOpt("steps").hasArg()
-				.desc("An integer representing the numbre of simulation steps. Default value: " + _stepsDefaultValue + ".")
+				.desc("An integer representing the number of simulation steps. Default value: " + _stepsDefaultValue + ".")
+				.build());
+		
+		cmdLineOptions.addOption(Option.builder("m").longOpt("mode").hasArg()
+				.desc("Execution Mode. Possible values: 'batch' (Batch mode), 'gui' (Graphical User Interface mode). Default value: '" + _stepsDefaultValue + "'.")
 				.build());
 
 		return cmdLineOptions;
@@ -242,6 +249,10 @@ public class Main {
 		} catch (Exception e) {
 			throw new ParseException("Invalid steps value: " + steps);
 		}
+	}
+	
+	private static void startGUIMode() {
+		SwingUtilities.invokeAndWait(() -> new MainWindow(ctrl));
 	}
 
 	private static void startBatchMode() throws Exception {
