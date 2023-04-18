@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import simulator.control.Controller;
 import simulator.model.BodiesGroup;
@@ -23,6 +25,8 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 	
 	private Controller ctrl;
 	private boolean stopped = true;
+	private int steps;
+	private double dtime;
 	
 	private JToolBar toolaBar;
 	private JFileChooser fc;
@@ -35,6 +39,9 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 	private JButton viewerButton;
 	private JButton runButton;
 	private JButton stopButton;
+	
+	private JSpinner stepsSpinner;
+	private JTextField deltaTimeField;
 	
 	
 	ControlPanel(Controller ctrl) {
@@ -77,7 +84,7 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 		viewerButton.setIcon(new ImageIcon("resources/icons/viewer.png"));
 		viewerButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) { }
+			public void actionPerformed(ActionEvent e) { showViewerWindow(); }
 		});
 		toolaBar.add(viewerButton);
 		
@@ -86,19 +93,44 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 		runButton = new JButton();
 		runButton.setToolTipText("Run Simulation");
 		runButton.setIcon(new ImageIcon("resources/icons/run.png"));
-		
+		runButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) { run(steps); }
+		});
 		toolaBar.add(runButton);
 		
 		//StopButton
 		stopButton = new JButton();
 		stopButton.setToolTipText("Stop Simulation");
 		stopButton.setIcon(new ImageIcon("resources/icons/stop.png"));
-		
+		stopButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) { stopped = true; }
+		});
+		stopButton.setEnabled(false);
 		toolaBar.add(stopButton);
 		
 		//Steps JSpinner
+		toolaBar.addSeparator();
+		stepsSpinner = new JSpinner();
+		stepsSpinner.setValue(10000);
+		stepsSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				steps = Integer.parseInt(stepsSpinner.getValue().toString());
+			}
+		});
+		
+		toolaBar.add(new JLabel("Steps:"));
+		toolaBar.add(stepsSpinner);
 		
 		//DeltaTime JTextField
+		toolaBar.addSeparator();
+		deltaTimeField = new JTextField();
+		deltaTimeField.setText("2500.0");
+		deltaTimeField.setEditable(true);
+		toolaBar.add(new JLabel("DeltaTime:"));
+		toolaBar.add(deltaTimeField);
 
 		//QUIT BUTTON
 		toolaBar.add(Box.createGlue()); // aligns button to right
@@ -118,16 +150,15 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 			try {
 				ctrl.run(1);
 			} catch (Exception e) {
-				// TODO llamar a Utils.showErrorMsg con el mensaje de error que
-				// corresponda
-				// TODO activar todos los botones
+				Utils.showErrorMsg("Simulation encountered a problem...");
+				enableButtons();
 				stopped = true;
 				return;
 			}
 			
 			SwingUtilities.invokeLater(() -> run_sim(n - 1));
 		} else {
-		// TODO activar todos los botones
+		enableButtons();
 		stopped = true;
 		}
 	}
@@ -153,7 +184,24 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 	}
 	
 	private void showViewerWindow() {
-		//vw.add(new ViewerWindow(ctrl))
+		vw.add(new ViewerWindow(new JFrame("Viewer Window"), ctrl));
+	}
+	
+	private void run(int steps) {
+		fchooserButton.setEnabled(false);
+		forcelawsButton.setEnabled(false);
+		viewerButton.setEnabled(false);
+		stopButton.setEnabled(true);
+		stopped = false;
+		ctrl.setDeltaTime(Double.parseDouble(deltaTimeField.getText().toString()));
+		run_sim(steps);
+	}
+	
+	private void enableButtons() {
+		fchooserButton.setEnabled(true);
+		forcelawsButton.setEnabled(true);
+		viewerButton.setEnabled(true);
+		stopButton.setEnabled(false);
 	}
 	@Override
 	public void onAdvance(Map<String, BodiesGroup> groups, double time) {

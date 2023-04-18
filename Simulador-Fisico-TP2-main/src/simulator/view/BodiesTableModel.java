@@ -14,71 +14,94 @@ import simulator.model.SimulatorObserver;
 public class BodiesTableModel extends AbstractTableModel implements SimulatorObserver {
 	
 	String[] header = { "Id", "gId", "Mass", "Velocity", "Position", "Force" };
-	List<Body> bodies;
+	List<Body> tabbodies;
 	
 	BodiesTableModel(Controller ctrl) {
-		bodies = new ArrayList<>();
+		tabbodies = new ArrayList<>();
 		ctrl.addObserver(this);
 	}
 	
 	@Override
 	public int getRowCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return tabbodies.size();
 	}
 
 	@Override
 	public int getColumnCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return header.length;
 	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		switch(columnIndex) {
+		case 0:
+			return tabbodies.get(rowIndex).getId();
+		case 1:
+			return tabbodies.get(rowIndex).getgId();
+		case 2:
+			return tabbodies.get(rowIndex).getMass();
+		case 3:
+			return tabbodies.get(rowIndex).getVelocity().toString();
+		case 4:
+			return tabbodies.get(rowIndex).getPosition().toString();
+		case 5:
+			return tabbodies.get(rowIndex).getForce().toString();
+		default:
+			return null;
+		}
+	}
+	
+	@Override
+	public String getColumnName(int column) {
+		return header[column];
 	}
 
 	@Override
 	public void onAdvance(Map<String, BodiesGroup> groups, double time) {
-		// TODO Auto-generated method stub
-
+		for (Body b1 : tabbodies) {
+			BodiesGroup g = groups.get(b1.getgId());
+			for (Body b2 : g) {
+				if (b1.getId().equals(b2.getId())) 
+					b1 = b2;
+			}
+		}
+		fireTableStructureChanged();
 	}
 
 	@Override
 	public void onReset(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-
+		tabbodies.clear();
+		fireTableStructureChanged();
 	}
 
 	@Override
 	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-
+		for (BodiesGroup g: groups.values()) {
+			for (Body b: g) {
+				tabbodies.add(b);
+			}
+		}
+		fireTableStructureChanged();
 	}
 
 	@Override
 	public void onGroupAdded(Map<String, BodiesGroup> groups, BodiesGroup g) {
-		// TODO Auto-generated method stub
-
+		for (Body b: g) {
+			tabbodies.add(b);
+		}
+		fireTableStructureChanged();
 	}
 
 	@Override
 	public void onBodyAdded(Map<String, BodiesGroup> groups, Body b) {
-		// TODO Auto-generated method stub
-
+		tabbodies.add(b);
+		fireTableStructureChanged();
 	}
 
 	@Override
-	public void onDeltaTimeChanged(double dt) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onDeltaTimeChanged(double dt) {}
 
 	@Override
-	public void onForceLawsChanged(BodiesGroup g) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onForceLawsChanged(BodiesGroup g) {}
 
 }

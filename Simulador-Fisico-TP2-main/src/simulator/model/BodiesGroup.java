@@ -8,12 +8,13 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class BodiesGroup {
+public class BodiesGroup implements Iterable<Body>{
 	
 	private String id;
 	private ForceLaws forcelaws;
 	private List<Body> bodies;
-	private List<Body> bodiesRO;	
+	private List<Body> bodiesRO;
+	
 	public BodiesGroup(String id, ForceLaws forcelaws) {
 		if (id != null && forcelaws != null && id.trim().length()>0) {
 			this.id = id;
@@ -72,6 +73,11 @@ public class BodiesGroup {
 	
 	public String getForceLawsInfo() {
 		return forcelaws.toString();
+	}
+
+	@Override
+	public Iterator<Body> iterator() {
+		return bodiesRO.iterator();
 	}
 
 	
