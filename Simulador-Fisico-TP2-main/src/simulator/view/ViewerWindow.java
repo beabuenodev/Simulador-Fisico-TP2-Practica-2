@@ -1,6 +1,7 @@
 package simulator.view;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Map;
 
@@ -33,7 +34,49 @@ public class ViewerWindow extends JFrame implements SimulatorObserver {
 		// TODO crear el viewer y añadirlo a mainPanel (en el centro)
 		// TODO en el método windowClosing, eliminar ‘this’ de los observadores
 		
-		addWindowListener(new WindowListener() { /*rellenar*/ });
+		addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			} /*rellenar*/ });
 		pack();
 			if (parent != null)
 				setLocation(

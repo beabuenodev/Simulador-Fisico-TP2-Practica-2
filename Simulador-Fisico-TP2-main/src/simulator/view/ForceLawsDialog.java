@@ -1,6 +1,7 @@
 package simulator.view;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.util.List;
 import java.util.Map;
 

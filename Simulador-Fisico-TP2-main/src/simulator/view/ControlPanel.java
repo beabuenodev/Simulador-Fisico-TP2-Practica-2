@@ -1,15 +1,18 @@
 package simulator.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import simulator.control.Controller;
 import simulator.model.BodiesGroup;
@@ -19,16 +22,26 @@ import simulator.model.SimulatorObserver;
 public class ControlPanel extends JPanel implements SimulatorObserver {
 	
 	private Controller ctrl;
+	private boolean stopped = true;
+	
 	private JToolBar toolaBar;
 	private JFileChooser fc;
-	private boolean stopped = true;
+	private ForceLawsDialog fld;
+	private List<ViewerWindow> vw;
+	
 	private JButton quitButton;
-	private JButton fcButton;
+	private JButton fchooserButton;
+	private JButton forcelawsButton;
+	private JButton viewerButton;
+	private JButton runButton;
+	private JButton stopButton;
+	
 	
 	ControlPanel(Controller ctrl) {
 		this.ctrl = ctrl;
 		initGUI();
 		this.ctrl.addObserver(this);
+		vw = new ArrayList<ViewerWindow>();
 	}
 	
 	private void initGUI() {
@@ -36,10 +49,56 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 		toolaBar = new JToolBar();
 		add(toolaBar, BorderLayout.PAGE_START);
 		
-		// TODO crear los diferentes botones/atributos y añadirlos a _toolaBar.
-		// Todos ellos han de tener su correspondiente tooltip. Puedes utilizar
-		// _toolaBar.addSeparator() para añadir la línea de separación vertical
-		// entre las componentes que lo necesiten
+		//SELECTOR FICHEROS BUTTON
+		fc = new JFileChooser();
+		fchooserButton = new JButton();
+		fchooserButton.setToolTipText("Choose a File");
+		fchooserButton.setIcon(new ImageIcon("resources/icons/open.png"));
+		fchooserButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) { loadFile(); }
+		});
+		toolaBar.add(fchooserButton);
+		
+		//ForceLawsButton
+		toolaBar.addSeparator();
+		forcelawsButton = new JButton();
+		forcelawsButton.setToolTipText("Open Force Laws");
+		forcelawsButton.setIcon(new ImageIcon("resources/icons/physics.png"));
+		forcelawsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) { showForceLaws(); }
+		});
+		toolaBar.add(forcelawsButton);
+		
+		//ViewerWindowButton
+		viewerButton = new JButton();
+		viewerButton.setToolTipText("Open Viewer Window");
+		viewerButton.setIcon(new ImageIcon("resources/icons/viewer.png"));
+		viewerButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) { }
+		});
+		toolaBar.add(viewerButton);
+		
+		//RunButton
+		toolaBar.addSeparator();
+		runButton = new JButton();
+		runButton.setToolTipText("Run Simulation");
+		runButton.setIcon(new ImageIcon("resources/icons/run.png"));
+		
+		toolaBar.add(runButton);
+		
+		//StopButton
+		stopButton = new JButton();
+		stopButton.setToolTipText("Stop Simulation");
+		stopButton.setIcon(new ImageIcon("resources/icons/stop.png"));
+		
+		toolaBar.add(stopButton);
+		
+		//Steps JSpinner
+		
+		//DeltaTime JTextField
 
 		//QUIT BUTTON
 		toolaBar.add(Box.createGlue()); // aligns button to right
@@ -50,20 +109,52 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 		quitButton.addActionListener((e) -> Utils.quit(this));
 		toolaBar.add(quitButton);
 		
-		//SELECTOR FICHEROS BUTTON
-		fc = new JFileChooser();
-		fcButton = new JButton();
-		fcButton.setToolTipText("Choose a File");
-		fcButton.setIcon(new ImageIcon("resources/icons/open.png"));
-		//funcion fcButton
 		
-		//TODO ForceLawsButton
-		
-		//TODO ViewerWindowButton
-		
-		//TODO RunButton/StopButton
 	}
 	
+	private void run_sim(int n) {
+		if (n > 0 && !stopped) {
+			
+			try {
+				ctrl.run(1);
+			} catch (Exception e) {
+				// TODO llamar a Utils.showErrorMsg con el mensaje de error que
+				// corresponda
+				// TODO activar todos los botones
+				stopped = true;
+				return;
+			}
+			
+			SwingUtilities.invokeLater(() -> run_sim(n - 1));
+		} else {
+		// TODO activar todos los botones
+		stopped = true;
+		}
+	}
+	
+	private void loadFile() {
+		Component window = Utils.getWindow(this);
+		int res = fc.showOpenDialog(window);
+		if (res != JFileChooser.CANCEL_OPTION && res != JFileChooser.ERROR_OPTION) {
+			File file = fc.getSelectedFile();
+			ctrl.reset();
+			try {
+				ctrl.loadData(new FileInputStream(file));
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+	private void showForceLaws() {
+		if (fld == null)
+			fld = new ForceLawsDialog(Utils.getWindow(this), ctrl);
+		fld.open();
+	}
+	
+	private void showViewerWindow() {
+		//vw.add(new ViewerWindow(ctrl))
+	}
 	@Override
 	public void onAdvance(Map<String, BodiesGroup> groups, double time) {
 		// TODO Auto-generated method stub
