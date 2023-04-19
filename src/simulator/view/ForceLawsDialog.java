@@ -5,10 +5,7 @@ import java.awt.Frame;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import org.json.JSONObject;
@@ -27,49 +24,64 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 	private List<JSONObject> forceLawsInfo;
 	private String[] _headers = { "Key", "Value", "Description" };
 	
+	private JComboBox<String> lawsModelBox;
+	private JComboBox<String> groupsModelBox;
+	private JButton okButton;
+	private JButton cancelButton;
+	private JTable dataTable;
+	
 	// TODO en caso de ser necesario, añadir los atributos aquí…
 	
 	ForceLawsDialog(Frame parent, Controller ctrl) {
 		super(parent, true);
 		this.ctrl = ctrl;
 		initGUI();
-		// TODO registrar this como observer;
+		ctrl.addObserver(this);
 	}
 	
 	private void initGUI() {
-		
 		setTitle("Force Laws Selection");
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		setContentPane(mainPanel);
-		
 		// _forceLawsInfo se usará para establecer la información en la tabla
 		forceLawsInfo = ctrl.getForceLawsInfo();
 		// TODO crear un JTable que use _dataTableModel, y añadirla al panel
 		dataTableModel = new DefaultTableModel() {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-			// TODO hacer editable solo la columna 1
+				if (column == 1)
+					return true;
+				else return false;
 			}
 		};
+		dataTableModel.setColumnIdentifiers(_headers);
+		dataTable = new JTable(dataTableModel);
+		JScrollPane scrollPane = new JScrollPane(dataTable);
+		mainPanel.add(scrollPane);
 		
-	dataTableModel.setColumnIdentifiers(_headers);
-	lawsModel = new DefaultComboBoxModel<>();
-	
-	// TODO añadir la descripción de todas las leyes de fuerza a _lawsModel
-	// TODO crear un combobox que use _lawsModel y añadirlo al panel
-	
-	groupsModel = new DefaultComboBoxModel<>();
-	
-	// TODO crear un combobox que use _groupsModel y añadirlo al panel
-	// TODO crear los botones OK y Cancel y añadirlos al panel
-	
-	setPreferredSize(new Dimension(700, 400));
-	
-	pack();
-	
-	setResizable(false);
-	setVisible(false);
+		lawsModel = new DefaultComboBoxModel<>();
+		for (JSONObject f : forceLawsInfo) {
+			lawsModel.addElement(f.getString("desc"));
+		}
+		lawsModelBox = new JComboBox<String>(lawsModel);
+		mainPanel.add(lawsModelBox);
+		
+		groupsModel = new DefaultComboBoxModel<>();
+		groupsModelBox = new JComboBox<String>(groupsModel);
+		mainPanel.add(groupsModelBox);
+		
+		okButton = new JButton("OK");
+		mainPanel.add(okButton);
+		cancelButton = new JButton("Cancel");
+		mainPanel.add(cancelButton);
+		
+		setPreferredSize(new Dimension(700, 400));
+		
+		pack();
+		
+		setResizable(false);
+		setVisible(false);
 	
 	}
 	
