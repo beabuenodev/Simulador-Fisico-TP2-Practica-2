@@ -1,9 +1,14 @@
 package simulator.view;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,6 +28,8 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 	private Controller ctrl;
 	private List<JSONObject> forceLawsInfo;
 	private String[] _headers = { "Key", "Value", "Description" };
+	private int selectedflind;
+	private int status;
 	
 	private JComboBox<String> lawsModelBox;
 	private JComboBox<String> groupsModelBox;
@@ -50,9 +57,7 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 		dataTableModel = new DefaultTableModel() {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				if (column == 1)
-					return true;
-				else return false;
+				return column == 1;
 			}
 		};
 		dataTableModel.setColumnIdentifiers(_headers);
@@ -65,16 +70,55 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 			lawsModel.addElement(f.getString("desc"));
 		}
 		lawsModelBox = new JComboBox<String>(lawsModel);
-		mainPanel.add(lawsModelBox);
+		lawsModelBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lawsModelBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lawsModelBoxAction();
+			}
+		});
 		
 		groupsModel = new DefaultComboBoxModel<>();
 		groupsModelBox = new JComboBox<String>(groupsModel);
-		mainPanel.add(groupsModelBox);
+		groupsModelBox.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
+		Box boxComboBox = Box.createHorizontalBox();
+		boxComboBox.add(new JLabel("Force Law: "));
+		boxComboBox.add(lawsModelBox);
+		boxComboBox.add(new JLabel("Group: "));
+		boxComboBox.add(groupsModelBox);
+		mainPanel.add(boxComboBox);
+		
+		JSeparator s = new JSeparator(JSeparator.HORIZONTAL);
+	    s.setPreferredSize(new Dimension(20, 20));
+	    mainPanel.add(s);
+	    
 		okButton = new JButton("OK");
+		okButton.setAlignmentX(CENTER_ALIGNMENT);
+		okButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				okAction();
+			}
+		});
 		mainPanel.add(okButton);
+		
 		cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cancelAction();
+			}
+			
+		});
+		cancelButton.setAlignmentX(CENTER_ALIGNMENT);
 		mainPanel.add(cancelButton);
+		
+		Box boxButton = Box.createHorizontalBox();
+		boxButton.add(okButton);
+		boxButton.add(cancelButton);
+		mainPanel.add(boxButton);
 		
 		setPreferredSize(new Dimension(700, 400));
 		
@@ -85,57 +129,74 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 	
 	}
 	
-	public void open() {
+	public int open() {
 		if (groupsModel.getSize() == 0)
-		//return status;
+			return status;
 			
-		// TODO Establecer la posición de la ventana de diálogo de tal manera que se
-		// abra en el centro de la ventana principal
+		this.setLocationRelativeTo(getParent());
 		pack();
 		setVisible(true);
-		//return status;
+		return status;
+	}
+	
+	private void lawsModelBoxAction() {
+		int opt = lawsModelBox.getSelectedIndex();
+		
+		if (dataTableModel.getRowCount() > 0) {
+			int rowcount = dataTableModel.getRowCount();
+			for (int i = 0; i < rowcount; i++) 
+				dataTableModel.removeRow(0);
+		}
+		
+		JSONObject forceLawsData = forceLawsInfo.get(opt).getJSONObject("data");
+		for (String s: forceLawsData.keySet()) {
+			Vector<String> row = new Vector<String>();
+			row.add(s);
+			row.add("");
+			row.add(forceLawsData.getString(s));
+			dataTableModel.addRow(row);
+		}
+		
+		selectedflind = opt;
+		dataTableModel.fireTableStructureChanged();
+	}
+	
+	private void okAction() {
+		
+	}
+	
+	private void cancelAction() {
+		setVisible(false);
 	}
 
 	@Override
-	public void onAdvance(Map<String, BodiesGroup> groups, double time) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onAdvance(Map<String, BodiesGroup> groups, double time) {}
 
 	@Override
 	public void onReset(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-
+		groupsModel.removeAllElements();
 	}
 
 	@Override
 	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-
+		for (String i : groups.keySet()) {
+			groupsModel.addElement(groups.get(i).getId());
+		}
+		selectedflind = 0;
 	}
 
 	@Override
 	public void onGroupAdded(Map<String, BodiesGroup> groups, BodiesGroup g) {
-		// TODO Auto-generated method stub
-
+		groupsModel.addElement(g.getId());
 	}
 
 	@Override
-	public void onBodyAdded(Map<String, BodiesGroup> groups, Body b) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onBodyAdded(Map<String, BodiesGroup> groups, Body b) {}
 
 	@Override
-	public void onDeltaTimeChanged(double dt) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onDeltaTimeChanged(double dt) {}
 
 	@Override
-	public void onForceLawsChanged(BodiesGroup g) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onForceLawsChanged(BodiesGroup g) {}
 
 }
