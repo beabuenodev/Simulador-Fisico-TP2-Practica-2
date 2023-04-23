@@ -265,9 +265,11 @@ public class Main {
 	
 	private static void startGUIMode() throws Exception, InterruptedException {
 		PhysicsSimulator simulator = new PhysicsSimulator(_forceLawsFactory.createInstance(_forceLawsInfo), _dtime);
-		InputStream inputstream = new FileInputStream(new File(_inFile));
 		Controller controller = new Controller(simulator, _bodyFactory, _forceLawsFactory);
-		controller.loadData(inputstream);
+		if (_inFile != null) {
+			InputStream inputstream = new FileInputStream(new File(_inFile));
+			controller.loadData(inputstream);                                 
+		}
 		SwingUtilities.invokeAndWait(() -> new MainWindow(controller));
 	}
 

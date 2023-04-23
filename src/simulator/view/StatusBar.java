@@ -11,6 +11,7 @@ import simulator.model.BodiesGroup;
 import simulator.model.Body;
 import simulator.model.SimulatorObserver;
 
+@SuppressWarnings("serial")
 public class StatusBar extends JPanel implements SimulatorObserver {
 
 	private JLabel timeLabel;
@@ -55,10 +56,7 @@ public class StatusBar extends JPanel implements SimulatorObserver {
 	}
 
 	@Override
-	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {}
 
 	@Override
 	public void onGroupAdded(Map<String, BodiesGroup> groups, BodiesGroup g) {
@@ -66,21 +64,12 @@ public class StatusBar extends JPanel implements SimulatorObserver {
 	}
 
 	@Override
-	public void onBodyAdded(Map<String, BodiesGroup> groups, Body b) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onBodyAdded(Map<String, BodiesGroup> groups, Body b) {}
 
 	@Override
-	public void onDeltaTimeChanged(double dt) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onDeltaTimeChanged(double dt) {}
 
 	@Override
-	public void onForceLawsChanged(BodiesGroup g) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onForceLawsChanged(BodiesGroup g) {}
 
 }

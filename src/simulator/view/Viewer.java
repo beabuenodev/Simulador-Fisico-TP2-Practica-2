@@ -90,66 +90,6 @@ class Viewer extends SimulationViewer {
 			public void keyReleased(KeyEvent e) {
 			}
 
-			/*
-			 * 
-			 * TODO
-			 * 
-			 * EN: handle keys 'j','l','i','m' to add 10/-10 to _originX/_originY, and then
-			 * call repaint(). This will make the origin point moves left/right/up/down. See
-			 * how the values of _centerX and _centerY are calculated in method
-			 * paintComponent
-			 * 
-			 * ES: Gestiona las teclas 'j','l','i','m' para sumar 10/-10 a
-			 * _originX/_originY, y luego llame a repaint(). Esto hará que el punto de
-			 * origen se mueva hacia la izquierda/derecha/arriba/abajo. Vea cómo se calculan
-			 * los valores de _centerX y _centerY en el método paintComponent
-			 * 
-			 * TODO
-			 * 
-			 * EN: handle key 'k' to set _originX and _originY to 0, and then call
-			 * repaint(). This will return the origin point to the center of the window.
-			 * 
-			 * ES: Gestiona la tecla 'k' para poner _originX y _originY en 0, y luego llame
-			 * a repaint(). Esto hace que el punto de origen sea el centro de la ventana.
-			 * 
-			 * TODO
-			 * 
-			 * EN: handle key 'h' to change the value of _showHelp to !_showHelp, and then
-			 * call repaint(). This will make show/hide the help text - see method
-			 * paintComponent
-			 * 
-			 * ES: gestiona la tecla 'h' para cambiar el valor de _showHelp a !_showHelp, y
-			 * luego llame a repaint(). Esto hará que se muestre/oculte el texto de ayuda -
-			 * ver método paintComponent
-			 * 
-			 * TODO
-			 * 
-			 * EN: handle key 'v' to change the value of _showVectors to !_showVectors, and
-			 * then call repaint(). You will use this variable in drawBodies to decide if to
-			 * show or hide the velocity/force vectors.
-			 * 
-			 * ES: gestiona la tecla 'v' para cambiar el valor de _showVectors a
-			 * !_showVectors, y luego llame a repaint(). Tienes que usar esta variable en
-			 * drawBodies para decidir si mostrar u ocultar los vectores de
-			 * velocidad/fuerza.
-			 * 
-			 * TODO
-			 * 
-			 * EN: handle key 'g' such that it makes the next group visible. Note that after
-			 * the last group all bodies are shown again. This should be done by modifying
-			 * _selectedGroupIdx from -1 (all groups) to _groups.size()-1 in a circular way.
-			 * When its value is -1 you should set _selectedGroup to null, otherwise to the
-			 * id of the corresponding group. Then in method showBodies you will draw only
-			 * those that belong to the selected group.
-			 * 
-			 * ES: gestionar la tecla 'g' de manera que haga visible el siguiente grupo.
-			 * Tenga en cuenta que después del último grupo, se muestran todos los cuerpos.
-			 * Esto se puede hacer modificando _selectedGroupIdx de -1 (todos los grupos) a
-			 * _groups.size()-1 de forma circular. Cuando su valor es -1, _selectedGroup
-			 * sería nulo, de lo contrario, sería el id del grupo correspondiente. En el
-			 * método showBodies, solo dibujarás los que pertenecen al grupo seleccionado.
-			 * 
-			 */
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.getKeyChar()) {
@@ -165,7 +105,43 @@ class Viewer extends SimulationViewer {
 					autoScale();
 					repaint();
 					break;
-
+				case 'j':
+					_originX -= 10;
+					repaint();
+					break;
+				case 'l':
+					_originX += 10;
+					repaint();
+					break;
+				case 'i':
+					_originY -= 10;
+					repaint();
+					break;
+				case 'm':
+					_originY += 10;
+					repaint();
+					break;
+				case 'k':
+					_originX = 0;
+					_originY = 0;
+					repaint();
+					break;
+				case 'h':
+					_showHelp = !_showHelp;
+					repaint();
+					break;
+				case 'v':
+					_showVectors = !_showVectors;
+					repaint();
+					break;
+				case 'g':
+					if (_selectedGroupIdx <= -1) {
+						_selectedGroupIdx = _groups.size();
+						_selectedGroup = null;
+					} else _selectedGroup = _groups.get(_selectedGroupIdx).getId();
+					_selectedGroupIdx--;
+					repaint();
+					break;
 				default:
 				}
 			}
@@ -223,64 +199,46 @@ class Viewer extends SimulationViewer {
 	}
 
 	private void showHelp(Graphics2D g) {
-		/*
-		 * TODO
-		 * 
-		 * EN: complete to show the following text on the top-left corner:
-		 * 
-		 * h: toggle help, v: toggle vectors, +: zoom-in, -: zoom-out, =: fit //
-		 * l: move right, j: move left, i: move up, m: move down: k: reset 
-		 * g: show next group
-		 * Scaling ratio: ... 
-		 * Selected Group: ...
-		 * 
-		 * ES: completa el método para que muestre el siguiente texto en la esquina
-		 * superior izquierda:
-		 * 
-		 * h: toggle help, v: toggle vectors, +: zoom-in, -: zoom-out, =: fit 
-		 * l: move right, j: move left, i: move up, m: move down: k: reset 
-		 * g: show next group
-		 * Scaling ratio: ... 
-		 * Selected Group: ...
-		 * 
-		 */
+		g.setColor(Color.PINK);
+		g.drawString("h: toggle help, v: toggle vectors, +: zoom-in, -: zoom-out, =: fit", 10, 20);
+		g.drawString("g: show next group", 10, 30);
+		g.drawString("l: move right, j: move left, i: move up, m: move down: k: reset", 10, 50);
+		g.drawString("Scaling ratio: " + _scale, 10, 60);
+		g.setColor(Color.BLUE);
+		if (_selectedGroup != null) g.drawString("Selected groups: " + _selectedGroup, 10, 80);
+		else g.drawString("Selected groups: all", 10, 80);
 	}
 
 	private void drawBodies(Graphics2D g) {
-		/*
-		 * TODO
-		 * 
-		 * EN: draw all bodies for which isVisible(b) return 'true' (see isVisible
-		 * below, it returns true if the body belongs to the selected group). For each
-		 * body, you should draw the velocity and force vectors if _showVectors is true.
-		 * Use method drawLineWithArrow to draw the vectors. The color of body 'b'
-		 * should be _gColor.get(b.getgId()) -- see method addGroup below. You should
-		 * assume that the origin point is (_centerX,_centerY), and recall to divide the
-		 * coordinates of the body by the value of _scale.
-		 * 
-		 * 
-		 * ES: Dibuja todos los cuerpos para los que isVisible(b) devuelve 'true' (ver
-		 * isVisible abajo, devuelve 'true' si el cuerpo pertenece al grupo
-		 * seleccionado). Para cada cuerpo, debes dibujar los vectores de velocidad y
-		 * fuerza si _showVectors es 'true'. Usa el método drawLineWithArrow para
-		 * dibujar los vectores. El color del cuerpo 'b' debe ser
-		 * _gColor.get(b.getgId()) -- ver el método addGroup. Como punto de origen usar
-		 * (_centerX,_centerY), y recordar dividir las coordenadas del cuerpo por el
-		 * valor de _scale.
-		 * 
-		 */
+		for (Body b: _bodies) {
+			if (isVisible(b)) {
+				g.setColor(_gColor.get(b.getgId()));
+				int x = (int) (_centerX + (b.getPosition().getX()/_scale));
+				int y = (int) (_centerY - (b.getPosition().getY()/_scale));
+				g.fillOval(x, y, 15, 15);
+				g.setColor(Color.BLACK);
+				g.drawString(b.getId(), x, y - 10);
+				if (_showVectors) {
+					Vector2D f = b.getForce().direction();
+					Vector2D v = b.getVelocity().direction();
+					drawLineWithArrow(g, 
+							x + 5, y,
+							x + (int) (f.getX()*25), y + (int) (f.getY()*(-25)), 
+							5, 5, 
+							Color.BLUE, Color.BLUE);
+					
+					drawLineWithArrow(g, 
+							x + 5, y,
+							x + (int) (v.getX()*25), y + (int) (v.getY()*(-25)), 
+							5, 5, 
+							Color.RED, Color.RED);
+				}
+			}
+		}
 	}
 
 	private boolean isVisible(Body b) {
-		/*
-		 * TODO 
-		 * 
-		 * EN: return true if _selectedGroup is null or equal to b.getgId() 
-		 * 
-		 * ES: devuelve true si _selectedGroup es null o igual a b.getgId()
-		 *
-		 */
-		return false;
+		return _selectedGroup == null || _selectedGroup.equals(b.getgId());
 	}
 
 	// calculates a value for scale such that all visible bodies fit in the window
@@ -301,14 +259,9 @@ class Viewer extends SimulationViewer {
 
 	@Override
 	public void addGroup(BodiesGroup g) {
-		/*
-		 * TODO
-		 * 
-		 * EN: add g to _groups and its bodies to _bodies
-		 *
-		 * ES: añadir g a _groups y sus cuerpos a _bodies
-		 * 
-		 */
+		for (Body b: g) 
+			_bodies.add(b);
+		_groups.add(g);
 		_gColor.put(g.getId(), _colorGen.nextColor()); // assign color to group
 		autoScale();
 		update();
@@ -316,29 +269,16 @@ class Viewer extends SimulationViewer {
 
 	@Override
 	public void addBody(Body b) {
-		/*
-		 * TODO
-		 * 
-		 *  EN: add b to _bodies
-		 *  
-		 *  ES: añadir b a _bodies
-		 *  
-		 */
+		_bodies.add(b);
 		autoScale();
 		update();
 	}
 
 	@Override
 	public void reset() {
-		/*
-		 * TODO
-		 * 
-		 * EN: clear the group list, bodies list, and the colors map
-		 * 
-		 * ES: borrar (usando el método clear) la lista de grupos, la lista de cuerpos y
-		 * el mapa de colores
-		 * 
-		 */
+		_groups.clear();
+		_bodies.clear();
+		_gColor.clear();
 		_colorGen.reset(); // reset the color generator
 		_selectedGroupIdx = -1;
 		_selectedGroup = null;

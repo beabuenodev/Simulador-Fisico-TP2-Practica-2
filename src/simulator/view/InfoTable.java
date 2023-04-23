@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.TableModel;
 
+@SuppressWarnings("serial")
 public class InfoTable extends JPanel {
 	
 	String title;

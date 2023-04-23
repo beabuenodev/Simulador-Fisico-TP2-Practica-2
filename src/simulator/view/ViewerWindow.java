@@ -5,14 +5,14 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import simulator.control.Controller;
 import simulator.model.BodiesGroup;
 import simulator.model.Body;
 import simulator.model.SimulatorObserver;
 
+@SuppressWarnings("serial")
 public class ViewerWindow extends JFrame implements SimulatorObserver {
 	
 	private Controller ctrl;
@@ -29,102 +29,74 @@ public class ViewerWindow extends JFrame implements SimulatorObserver {
 	
 	private void intiGUI() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
-		
-		// TODO poner contentPane como mainPanel con scrollbars (JScrollPane)
-		// TODO crear el viewer y añadirlo a mainPanel (en el centro)
-		// TODO en el método windowClosing, eliminar ‘this’ de los observadores
+		mainPanel.add(new JScrollPane());
+		setContentPane(mainPanel);
+		viewer = new Viewer();
+		mainPanel.add(viewer, BorderLayout.CENTER);
 		
 		addWindowListener(new WindowListener() {
-
 			@Override
-			public void windowOpened(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void windowOpened(WindowEvent e) {}
 			@Override
-			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void windowClosing(WindowEvent e) {}
 			@Override
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
+				removeObserver();
 			}
+			@Override
+			public void windowIconified(WindowEvent e) {}
 
 			@Override
-			public void windowIconified(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void windowDeiconified(WindowEvent e) {}
 
 			@Override
-			public void windowDeiconified(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void windowActivated(WindowEvent e) {}
 
 			@Override
-			public void windowActivated(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-				// TODO Auto-generated method stub
-				
-			} /*rellenar*/ });
+			public void windowDeactivated(WindowEvent e) {}});
 		pack();
-			if (parent != null)
+			/*if (parent != null)
 				setLocation(
 						parent.getLocation().x + parent.getWidth()/2 - getWidth()/2,
-						parent.getLocation().y + parent.getHeight()/2 - getHeight()/2);
+						parent.getLocation().y + parent.getHeight()/2 - getHeight()/2);*/
 		setVisible(true);
 	}
 
 	@Override
 	public void onAdvance(Map<String, BodiesGroup> groups, double time) {
-		// TODO Auto-generated method stub
-
+		viewer.update();
 	}
 
 	@Override
 	public void onReset(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-
+		viewer.reset();
 	}
 
 	@Override
 	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {
-		// TODO Auto-generated method stub
-
+		for (String i:groups.keySet()) {
+			viewer.addGroup(groups.get(i));
+		}
 	}
 
 	@Override
 	public void onGroupAdded(Map<String, BodiesGroup> groups, BodiesGroup g) {
-		// TODO Auto-generated method stub
-
+		viewer.addGroup(g);
 	}
 
 	@Override
 	public void onBodyAdded(Map<String, BodiesGroup> groups, Body b) {
-		// TODO Auto-generated method stub
-
+		viewer.addBody(b);
 	}
 
 	@Override
-	public void onDeltaTimeChanged(double dt) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onDeltaTimeChanged(double dt) {}
 
 	@Override
-	public void onForceLawsChanged(BodiesGroup g) {
-		// TODO Auto-generated method stub
-
+	public void onForceLawsChanged(BodiesGroup g) {}
+	
+	private void removeObserver() {
+		ctrl.removeObserver(this);
 	}
 
 }

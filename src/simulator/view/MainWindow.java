@@ -9,6 +9,7 @@ import simulator.control.Controller;
 
 import javax.swing.*;
 
+@SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 	
 	private Controller ctrl;
