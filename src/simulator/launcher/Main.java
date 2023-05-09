@@ -176,9 +176,7 @@ public class Main {
 
 	private static void parseOutFileOption(CommandLine line) throws ParseException {
 		_outFile = line.getOptionValue("o");
-		if (_outFile == null && _mode.equalsIgnoreCase("batch")) {
-			throw new ParseException("In batch mode an output file is required");
-		}
+		
 	}
 
 	private static void parseDeltaTimeOption(CommandLine line) throws ParseException {

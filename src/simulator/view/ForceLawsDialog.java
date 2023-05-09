@@ -78,6 +78,7 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 		}
 		lawsModelBox = new JComboBox<String>(lawsModel);
 		lawsModelBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lawsModelBoxAction();
 		lawsModelBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -170,29 +171,24 @@ public class ForceLawsDialog extends JDialog implements SimulatorObserver {
 
 	private void okAction() {
 		JSONObject forcelawdata = new JSONObject();
-		JSONObject data = new JSONObject();
+		String s = "{";
 
 		try {
 			for (int i = 0; i < dataTableModel.getRowCount(); i++) {
 				String aux = dataTableModel.getValueAt(i, 1).toString();
+				String clave = dataTableModel.getValueAt(i, 0).toString();
+				s+=clave+":"+aux;
+				if(i<dataTableModel.getRowCount()-1) {
+					s+=",";
+				}
 				System.out.println(aux);
 				System.out.println(dataTableModel.getRowCount());
-				if (aux.startsWith("[")) { // if field is a vector
-					JSONArray vector = new JSONArray();
-					String newaux = aux.replace("[", "");
-					newaux = newaux.replace("]", "");
-					String vectoraux[] = newaux.split(",");
-
-					vector.put(Double.parseDouble(vectoraux[0]));
-					vector.put(Double.parseDouble(vectoraux[1]));
-					data.put(dataTableModel.getValueAt(i, 0).toString(), vector);
-				} else if (aux.contains(".")) { // if field is a double
-					data.put(dataTableModel.getValueAt(i, 0).toString(), Double.parseDouble(aux));
-					System.out.println(data.toString());
-				} else if (aux.isBlank()) { // if value is blank
-					data.put("", "");
-				}
+				
+					
 			}
+			s+="}";
+			System.out.println(s);
+			JSONObject data = new JSONObject(s);
 			forcelawdata.put("data", data);
 			forcelawdata.put("type", forceLawsInfo.get(selectedflind).getString("type"));
 			ctrl.setForceLaws(groupsModelBox.getSelectedItem().toString(), forcelawdata);

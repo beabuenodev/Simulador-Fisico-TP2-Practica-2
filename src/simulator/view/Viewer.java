@@ -219,17 +219,17 @@ class Viewer extends SimulationViewer {
 				g.setColor(Color.BLACK);
 				g.drawString(b.getId(), x, y - 10);
 				if (_showVectors) {
-					Vector2D f = b.getForce().direction();
-					Vector2D v = b.getVelocity().direction();
+					Vector2D f = b.getForce().direction().scale(20);
+					Vector2D v = b.getVelocity().direction().scale(20);
 					drawLineWithArrow(g, 
-							x + 5, y,
-							x + (int) (f.getX()*25), y + (int) (f.getY()*(-25)), 
+							x , y,
+							x + (int) (f.getX()), y - (int) (f.getY()), 
 							5, 5, 
 							Color.BLUE, Color.BLUE);
 					
 					drawLineWithArrow(g, 
-							x + 5, y,
-							x + (int) (v.getX()*25), y + (int) (v.getY()*(-25)), 
+							x , y,
+							x + (int) (v.getX()), y - (int) (v.getY()), 
 							5, 5, 
 							Color.RED, Color.RED);
 				}
