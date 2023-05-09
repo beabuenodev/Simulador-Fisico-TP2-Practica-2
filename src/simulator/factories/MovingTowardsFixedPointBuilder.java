@@ -31,6 +31,13 @@ public class MovingTowardsFixedPointBuilder extends Builder<ForceLaws> {
 		return new MovingTowardsFixedPoint(c,G);
 	}
 	
+	@Override
+	public void fillData(JSONObject json2) {
+		json2.put("c", "the point towards which bodies move (e.g., [100.0,50.0])");
+		json2.put("g", "the length of the acceleration vector (a number)");
+	}
+	
+	
 	public JSONObject getInfo() {
 		JSONObject json1 = new JSONObject();
 		json1.put("type", "mtfp");

@@ -28,7 +28,7 @@ public class StatusBar extends JPanel implements SimulatorObserver {
 		this.setBorder(BorderFactory.createBevelBorder(1));
 		
 		// timeLabel
-		timeLabel = new JLabel();
+		timeLabel = new JLabel("0");
 		this.add(new JLabel("time: "));
 		this.add(timeLabel);
 		JSeparator s1 = new JSeparator(JSeparator.VERTICAL);
@@ -36,7 +36,7 @@ public class StatusBar extends JPanel implements SimulatorObserver {
 		this.add(s1);
 		
 		// groupLabel
-		groupLabel = new JLabel();
+		groupLabel = new JLabel("0");
 		this.add(new JLabel("groups: "));
 		this.add(groupLabel);
 		JSeparator s2 = new JSeparator(JSeparator.VERTICAL);
@@ -56,11 +56,13 @@ public class StatusBar extends JPanel implements SimulatorObserver {
 	}
 
 	@Override
-	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {}
+	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {
+		groupLabel.setText(Integer.toString(groups.size()));
+	}
 
 	@Override
 	public void onGroupAdded(Map<String, BodiesGroup> groups, BodiesGroup g) {
-		groupLabel.setText(Integer.toString(groups.size() + 1));
+		groupLabel.setText(Integer.toString(groups.size()));
 	}
 
 	@Override

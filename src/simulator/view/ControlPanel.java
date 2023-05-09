@@ -65,7 +65,7 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 		add(toolaBar, BorderLayout.PAGE_START);
 
 		// SELECTOR FICHEROS BUTTON
-		fc = new JFileChooser();
+		fc = new JFileChooser("resources/examples/input");
 		fchooserButton = new JButton();
 		fchooserButton.setToolTipText("Choose a File");
 		fchooserButton.setIcon(new ImageIcon("resources/icons/open.png"));
@@ -236,6 +236,7 @@ public class ControlPanel extends JPanel implements SimulatorObserver {
 
 	@Override
 	public void onRegister(Map<String, BodiesGroup> groups, double time, double dt) {
+	deltaTimeField.setText(""+dt);
 	}
 
 	@Override
